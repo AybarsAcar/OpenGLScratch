@@ -39,6 +39,7 @@
 
 /* Begin PBXFileReference section */
 		0018052A25BA548C00BD17CB /* libGLEW.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libGLEW.a; path = ../../../../../usr/local/Cellar/glew/2.2.0_1/lib/libGLEW.a; sourceTree = "<group>"; };
+		0018053425BA92C500BD17CB /* Basic.shader */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Basic.shader; sourceTree = "<group>"; };
 		00E060D225B99DA600F9AC86 /* OpenGLFramework */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = OpenGLFramework; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E060D525B99DA600F9AC86 /* Application.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Application.cpp; sourceTree = "<group>"; };
 		00E060DE25B99E6400F9AC86 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
@@ -60,9 +61,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0018053225BA928700BD17CB /* res */ = {
+			isa = PBXGroup;
+			children = (
+				0018053325BA92A000BD17CB /* shaders */,
+			);
+			path = res;
+			sourceTree = "<group>";
+		};
+		0018053325BA92A000BD17CB /* shaders */ = {
+			isa = PBXGroup;
+			children = (
+				0018053425BA92C500BD17CB /* Basic.shader */,
+			);
+			path = shaders;
+			sourceTree = "<group>";
+		};
 		00E060C925B99DA600F9AC86 = {
 			isa = PBXGroup;
 			children = (
+				0018053225BA928700BD17CB /* res */,
 				00E060D425B99DA600F9AC86 /* OpenGLFramework */,
 				00E060D325B99DA600F9AC86 /* Products */,
 				00E060DD25B99E6400F9AC86 /* Frameworks */,

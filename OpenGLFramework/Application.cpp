@@ -5,11 +5,65 @@
 //  Created by Aybars Acar on 21/1/21.
 //
 
-#include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
+#include <iostream>
 #include <string>
 #include <cstring>
+#include <fstream>
+#include <sstream>
+
+/**
+ * return this struct as we parse the shader file into 2 different shader programs
+ */
+struct ShaderProgramSource
+{
+  std::string VertexSource;
+  std::string FragmentSource;
+};
+
+
+/**
+ * read in the files with c++
+ * C file API is faster to read files though
+ */
+static ShaderProgramSource ParseShader(const std::string &filepath)
+{
+  std::ifstream stream(filepath);
+  
+  enum class ShaderType
+  {
+    NONE = -1, VERTEX = 0, FRAGMENT = 1
+  };
+  
+  std::string line;
+  std::stringstream ss[2];  // one for vertex shader and one for fragment shader
+  auto type = ShaderType::NONE;
+  while (getline(stream, line))
+  {
+    if (line.find("#shader") != std::string::npos)
+    {
+      if (line.find("vertex") != std::string::npos)
+      {
+        // set mode to vertex
+        type = ShaderType::VERTEX;
+      }
+      else if (line.find("fragment") != std::string::npos)
+      {
+        // set mode to fragment
+        type = ShaderType::FRAGMENT;
+      }
+    }
+    else
+    {
+      ss[(int)type] << line << "\n";
+    }
+  }
+  
+//  set the first one to VertexSource and second one to FragmentSource
+  return {ss[0].str(), ss[1].str()};
+}
 
 
 /**
@@ -104,17 +158,22 @@ int main(void)
   std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
   std::cout << "Supported GLSL version is " << (char *)glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
   
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-  
 
-  float positions[6] =
+  
+//  draw a square with 2 trieangles
+  float positions[] =
   {
-    -0.5f,  -0.5f,
-     0.0f,   0.5f,
-     0.5f,  -0.5f,
+    -0.5f,  -0.5f,    // 0
+     0.5f,  -0.5f,    // 1
+     0.5f,   0.5f,    // 2
+    -0.5f,   0.5f,    // 3
+  };
+  
+//  indices buffer
+  unsigned int indices[] =
+  {
+    0, 1, 2,      // triangle 1
+    2, 3, 0,      // triangle 2
   };
   
   
@@ -128,41 +187,24 @@ int main(void)
 //  specify the data
 //  put the data into the buffer
 //  6 * sizeof(floa) == sizeof(positions)
-  glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), positions, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), positions, GL_STATIC_DRAW);
   
 //  we need to enable the vertex attribute with the index you want to enable
   glEnableVertexAttribArray(0);
 //  specify the attribute for hte first vertex whihc is at index 0, last 0 is 0 bytes
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
   
+//  define the index buffer
+  unsigned int indexBuffer;
+  glGenBuffers(1, &indexBuffer);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
   
-//  write the shader - instructions on how to draw on the window
-  std::string vertexShader = R"glsl(
-      
-    #version 120
   
-    attribute vec4 position;
-  
-    void main()
-    {
-      gl_Position = position;
-    }
-  
-  )glsl";
-  
-  std::string fragmentShader = R"glsl(
-      
-    #version 120
-  
-    void main()
-    {
-      gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-    }
-  
-  )glsl";
-  
+//  read in the shaders
+  ShaderProgramSource source = ParseShader("res/shaders/Basic.shader");
 
-  unsigned int shader = CreateShader(vertexShader, fragmentShader);
+  unsigned int shader = CreateShader(source.VertexSource, source.FragmentSource);
   
 //  bind the shader
   glUseProgram(shader);
@@ -175,7 +217,7 @@ int main(void)
     glClear(GL_COLOR_BUFFER_BIT);
     
 //    draw the triangle specified - draw call
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     
     glEnd();
     

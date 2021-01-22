@@ -14,6 +14,38 @@
 #include <fstream>
 #include <sstream>
 
+// the macros for OpenGL debugging that runs our functions
+// this creates a debugger
+#define ASSERT(x) if (!(x)) asm{int 3};
+
+#if DEBUG
+  #define GLCall(x) GLClearError();\
+      x;\
+  ASSERT(GLLogCall(#x, __FILE__, __LINE__))
+#else
+  #define GLCall(x) x
+#endif
+
+
+/**
+ * clear all the errors
+ */
+static void GLClearError()
+{
+  while (glGetError() != GL_NO_ERROR);
+}
+
+static bool GLLogCall(const char *function, const char *file,  int line)
+{
+//  runs until error variable is not 0
+  while (GLenum error =  glGetError())
+  {
+    std::cout << "[OpenGL Error] (" << error << "): " << function << " " << file << ": " << line << std::endl;
+    return false;
+  }
+  return true;
+}
+
 /**
  * return this struct as we parse the shader file into 2 different shader programs
  */
@@ -139,6 +171,12 @@ int main(void)
   /* Initialize the library */
   if (!glfwInit())
     return -1;
+  
+//  tell glfw we want to create this context with the call profile
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
  
   
   /* Create a windowed mode window and its OpenGL context */
@@ -152,6 +190,8 @@ int main(void)
 //  Create the openGl context
   /* Make the window's context current */
   glfwMakeContextCurrent(window);
+  
+  glfwSwapInterval(1);  // 1 is the default frame rate 60hz etc
   
 //  initialise glew
   if (glewInit() != GLEW_OK) std::cout << "Error" << std::endl;
@@ -176,29 +216,32 @@ int main(void)
     2, 3, 0,      // triangle 2
   };
   
+
+  unsigned int vao;
+  GLCall(glGenVertexArrays(1, &vao));
+  GLCall(glBindVertexArray(vao));
+
   
 //  define the vertex buffer
   unsigned int buffer;
-  glGenBuffers(1, &buffer); // gives us back an id
-  
+  GLCall(glGenBuffers(1, &buffer)); // gives us back an id
 //  select that bufffer
-  glBindBuffer(GL_ARRAY_BUFFER, buffer);
-  
+  GLCall(glBindBuffer(GL_ARRAY_BUFFER, buffer));
 //  specify the data
 //  put the data into the buffer
-//  6 * sizeof(floa) == sizeof(positions)
-  glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), positions, GL_STATIC_DRAW);
+//  6 * sizeof(float) == sizeof(positions)
+  GLCall(glBufferData(GL_ARRAY_BUFFER, 4 * 2 * sizeof(float), positions, GL_STATIC_DRAW));
   
 //  we need to enable the vertex attribute with the index you want to enable
-  glEnableVertexAttribArray(0);
+  GLCall(glEnableVertexAttribArray(0));
 //  specify the attribute for hte first vertex whihc is at index 0, last 0 is 0 bytes
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+  GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0));
   
 //  define the index buffer
   unsigned int indexBuffer;
-  glGenBuffers(1, &indexBuffer);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+  GLCall(glGenBuffers(1, &indexBuffer));
+  GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer));
+  GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW));
   
   
 //  read in the shaders
@@ -207,17 +250,50 @@ int main(void)
   unsigned int shader = CreateShader(source.VertexSource, source.FragmentSource);
   
 //  bind the shader
-  glUseProgram(shader);
+  GLCall(glUseProgram(shader));
   
+//  Pass down the colour from the CPU side to our shader
+  int location = glGetUniformLocation(shader, "u_Color");
+  ASSERT(location != -1);
   
+//  unbind everything - we have to do this each time we are changing the draw geometry
+  GLCall(glBindVertexArray(0));
+  GLCall(glUseProgram(0));
+  GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
+  GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+  
+  float redChannel = 0.0f;
+  float increment = 0.05f;
   /* Loop until the user closes the window */
   while (!glfwWindowShouldClose(window))
   {
     /* Render here */
-    glClear(GL_COLOR_BUFFER_BIT);
+    GLCall(glClear(GL_COLOR_BUFFER_BIT));
     
+//    bind them back
+    GLCall(glUseProgram(shader));
+    
+//    pass down the colour dynamically
+    glUniform4f(location, redChannel, 0.3f, 0.8f, 1.0f);
+    
+    GLCall(glBindVertexArray(vao));
+    
+    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer));
+    
+
 //    draw the triangle specified - draw call
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+    GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+    
+//    Animate the colour
+    if (redChannel > 1.0f)
+    {
+      increment = -0.05f;
+    }
+    else if (redChannel < 0.0f)
+    {
+      increment = 0.05f;
+    }
+    redChannel += increment;
     
     glEnd();
     

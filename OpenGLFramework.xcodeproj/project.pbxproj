@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		0018052F25BA556800BD17CB /* libGLEW.2.2.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 00E060E225B99EFC00F9AC86 /* libGLEW.2.2.0.dylib */; };
 		0018053025BA556800BD17CB /* libGLEW.2.2.0.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 00E060E225B99EFC00F9AC86 /* libGLEW.2.2.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		0099151325BAF84C004DBE96 /* Renderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0099151225BAF84C004DBE96 /* Renderer.cpp */; };
+		0099151625BAF921004DBE96 /* VertexBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0099151425BAF921004DBE96 /* VertexBuffer.cpp */; };
+		0099151925BAFBE1004DBE96 /* IndexBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0099151725BAFBE1004DBE96 /* IndexBuffer.cpp */; };
 		00E060D625B99DA600F9AC86 /* Application.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 00E060D525B99DA600F9AC86 /* Application.cpp */; };
 		00E060DF25B99E6400F9AC86 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00E060DE25B99E6400F9AC86 /* OpenGL.framework */; };
 		00E060E125B99ECD00F9AC86 /* libglfw.3.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 00E060E025B99ECD00F9AC86 /* libglfw.3.3.dylib */; };
@@ -40,6 +43,12 @@
 /* Begin PBXFileReference section */
 		0018052A25BA548C00BD17CB /* libGLEW.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libGLEW.a; path = ../../../../../usr/local/Cellar/glew/2.2.0_1/lib/libGLEW.a; sourceTree = "<group>"; };
 		0018053425BA92C500BD17CB /* Basic.shader */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Basic.shader; sourceTree = "<group>"; };
+		0099151125BAF834004DBE96 /* Renderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Renderer.h; sourceTree = "<group>"; };
+		0099151225BAF84C004DBE96 /* Renderer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Renderer.cpp; sourceTree = "<group>"; };
+		0099151425BAF921004DBE96 /* VertexBuffer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = VertexBuffer.cpp; sourceTree = "<group>"; };
+		0099151525BAF921004DBE96 /* VertexBuffer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = VertexBuffer.hpp; sourceTree = "<group>"; };
+		0099151725BAFBE1004DBE96 /* IndexBuffer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = IndexBuffer.cpp; sourceTree = "<group>"; };
+		0099151825BAFBE1004DBE96 /* IndexBuffer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = IndexBuffer.hpp; sourceTree = "<group>"; };
 		00E060D225B99DA600F9AC86 /* OpenGLFramework */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = OpenGLFramework; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E060D525B99DA600F9AC86 /* Application.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Application.cpp; sourceTree = "<group>"; };
 		00E060DE25B99E6400F9AC86 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
@@ -99,6 +108,12 @@
 			isa = PBXGroup;
 			children = (
 				00E060D525B99DA600F9AC86 /* Application.cpp */,
+				0099151425BAF921004DBE96 /* VertexBuffer.cpp */,
+				0099151525BAF921004DBE96 /* VertexBuffer.hpp */,
+				0099151125BAF834004DBE96 /* Renderer.h */,
+				0099151725BAFBE1004DBE96 /* IndexBuffer.cpp */,
+				0099151825BAFBE1004DBE96 /* IndexBuffer.hpp */,
+				0099151225BAF84C004DBE96 /* Renderer.cpp */,
 			);
 			path = OpenGLFramework;
 			sourceTree = "<group>";
@@ -171,7 +186,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0099151325BAF84C004DBE96 /* Renderer.cpp in Sources */,
 				00E060D625B99DA600F9AC86 /* Application.cpp in Sources */,
+				0099151925BAFBE1004DBE96 /* IndexBuffer.cpp in Sources */,
+				0099151625BAF921004DBE96 /* VertexBuffer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

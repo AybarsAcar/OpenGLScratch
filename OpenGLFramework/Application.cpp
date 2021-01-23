@@ -18,6 +18,7 @@
 #include "VertexArray.hpp"
 #include "Shader.hpp"
 #include "VertexBufferLayout.hpp"
+#include "Texture.hpp"
 
 int main(void)
 {
@@ -56,12 +57,13 @@ int main(void)
   
   {
     //  draw a square with 2 trieangles
+//    add 2 more floats whihc are our texture coordinates
     float positions[] =
     {
-      -0.5f,  -0.5f,    // 0
-      0.5f,  -0.5f,    // 1
-      0.5f,   0.5f,    // 2
-      -0.5f,   0.5f,    // 3
+      -0.5f,  -0.5f, 0.0f, 0.0f,    // 0
+      0.5f,   -0.5f, 1.0f, 0.0f,    // 1
+      0.5f,    0.5f, 1.0f, 1.0f,    // 2
+      -0.5f,   0.5f, 0.0f, 1.0f,    // 3
     };
     
     //  indices buffer
@@ -71,14 +73,19 @@ int main(void)
       2, 3, 0,      // triangle 2
     };
     
+//    Blending
+    GLCall(glEnable(GL_BLEND));
+    GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+    
 //    initialise the vertex array
     VertexArray va;
     
     //  create the vertex buffer - our constructor automatically binds it as well
-    VertexBuffer vb(positions, 4 * 2 * sizeof(float));
+    VertexBuffer vb(positions, 4 * 4 * sizeof(float));
     
     VertexBufferLayout layout;
     
+    layout.Push<float>(2);
     layout.Push<float>(2);
     va.AddBuffer(vb, layout);
   
@@ -89,6 +96,11 @@ int main(void)
     shader.Bind();
     
     shader.SetUniform4F("u_Color", 0.8f, 0.3f, 0.8f, 0.1f);
+    
+//    load the texture and bind
+    Texture texture("res/textures/robot.png");
+    texture.Bind(); // bind our texture to slot 0 by default
+    shader.SetUniform1i("u_Texture", 0);  // because we bound our texture to slot 0 which has to match!
     
     //  unbind everything - we have to do this each time we are changing the draw geometry
     va.Unbind();

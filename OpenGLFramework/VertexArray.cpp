@@ -8,6 +8,7 @@
 #include "VertexArray.hpp"
 
 #include "Renderer.h"
+#include "VertexBufferLayout.hpp"
 
 VertexArray::VertexArray()
 {

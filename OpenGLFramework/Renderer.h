@@ -9,6 +9,9 @@
 #define Renderer_h
 
 #include <GL/glew.h>
+#include "VertexArray.hpp"
+#include "IndexBuffer.hpp"
+#include "Shader.hpp"
 
 // the macros for OpenGL debugging that runs our functions
 // this creates a debugger
@@ -29,6 +32,19 @@
 void GLClearError();
 
 bool GLLogCall(const char *function, const char *file,  int line);
+
+/**
+ * it is either a Singleton - static
+ * or could not be Singleton - i wont be implementing as singleton
+ */
+class Renderer
+{
+private:
+  
+public:
+  void Clear() const;
+  void Draw(const VertexArray &va, const IndexBuffer &ib, const Shader &shader) const;
+};
 
 
 #endif /* Renderer_h */

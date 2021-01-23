@@ -11,7 +11,8 @@
 #include <stdio.h>
 
 #include "VertexBuffer.hpp"
-#include "VertexBufferLayout.hpp"
+
+class VertexBufferLayout;
 
 /**
  *

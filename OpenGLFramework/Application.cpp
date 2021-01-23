@@ -10,15 +10,14 @@
 
 #include <iostream>
 #include <string>
-#include <cstring>
-#include <fstream>
-#include <sstream>
 
 #include "Renderer.h"
+
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
 #include "VertexArray.hpp"
 #include "Shader.hpp"
+#include "VertexBufferLayout.hpp"
 
 int main(void)
 {
@@ -97,13 +96,15 @@ int main(void)
     vb.Unbind();
     shader.Unbind();
     
+    Renderer renderer;
+    
     float redChannel = 0.0f;
     float increment = 0.05f;
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
       /* Render here */
-      GLCall(glClear(GL_COLOR_BUFFER_BIT));
+      renderer.Clear();
       
       //    bind them back
       shader.Bind();
@@ -111,10 +112,7 @@ int main(void)
       //    pass down the colour dynamically
       shader.SetUniform4F("u_Color", redChannel, 0.3f, 0.8f, 1.0f);
       
-      va.Bind();
-      
-      //    bind it back using our class
-      ib.Bind();
+      renderer.Draw(va, ib, shader);
       
       //    draw the triangle specified - draw call
       GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));

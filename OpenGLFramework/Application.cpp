@@ -20,6 +20,10 @@
 #include "VertexBufferLayout.hpp"
 #include "Texture.hpp"
 
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
+
 int main(void)
 {
   GLFWwindow* window;
@@ -29,6 +33,7 @@ int main(void)
     return -1;
   
   //  tell glfw we want to create this context with the call profile
+//  set the glfw context
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy
@@ -36,7 +41,7 @@ int main(void)
   
   
   /* Create a windowed mode window and its OpenGL context */
-  window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+  window = glfwCreateWindow(960, 540, "Hello World", NULL, NULL);
   if (!window)
   {
     glfwTerminate();
@@ -60,10 +65,10 @@ int main(void)
 //    add 2 more floats whihc are our texture coordinates
     float positions[] =
     {
-      -0.5f,  -0.5f, 0.0f, 0.0f,    // 0
-      0.5f,   -0.5f, 1.0f, 0.0f,    // 1
-      0.5f,    0.5f, 1.0f, 1.0f,    // 2
-      -0.5f,   0.5f, 0.0f, 1.0f,    // 3
+      100.0f,  100.0f, 0.0f, 0.0f,    // 0
+      200.0f,  100.0f, 1.0f, 0.0f,    // 1
+      200.0f,  200.0f, 1.0f, 1.0f,    // 2
+      100.0f,  200.0f, 0.0f, 1.0f,    // 3
     };
     
     //  indices buffer
@@ -92,10 +97,15 @@ int main(void)
     //  define the index buffer
     IndexBuffer ib(indices, 6);
     
+//    create the projection matrix - orthographic
+//    4 by 4 matrix
+    glm::mat4 projection = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
+    
     Shader shader("res/shaders/Basic.shader");
     shader.Bind();
     
-    shader.SetUniform4F("u_Color", 0.8f, 0.3f, 0.8f, 0.1f);
+    shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 0.1f);
+    shader.SetUniformMat4f("u_MVP", projection);
     
 //    load the texture and bind
     Texture texture("res/textures/robot.png");
@@ -122,7 +132,7 @@ int main(void)
       shader.Bind();
       
       //    pass down the colour dynamically
-      shader.SetUniform4F("u_Color", redChannel, 0.3f, 0.8f, 1.0f);
+      shader.SetUniform4f("u_Color", redChannel, 0.3f, 0.8f, 1.0f);
       
       renderer.Draw(va, ib, shader);
       

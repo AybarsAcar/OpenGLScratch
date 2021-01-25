@@ -11,6 +11,10 @@
 #include <iostream>
 #include <string>
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 #include "Renderer.h"
 
 #include "VertexBuffer.hpp"
@@ -47,6 +51,11 @@ int main(void)
     glfwTerminate();
     return -1;
   }
+  
+//  ImGui context;
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  ImGuiIO &io = ImGui::GetIO(); (void)io;
   
   //  Create the openGl context
   /* Make the window's context current */
@@ -98,14 +107,24 @@ int main(void)
     IndexBuffer ib(indices, 6);
     
 //    create the projection matrix - orthographic
-//    4 by 4 matrix
+//    4 by 4 matrix, we make every unit 1 pixel by making it the same size as our window
     glm::mat4 projection = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
+    
+//    view matrix - the position of our camera
+//    move camera 100 units to the right, so the object will move 100 to the left which is -100
+    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-100, 0, 0));
+    
+//    model matrix - move the model up and right a bit
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(200, 200, 0));
+    
+//    mvp matrix
+    glm::mat4 mvp = projection * view * model;
     
     Shader shader("res/shaders/Basic.shader");
     shader.Bind();
     
     shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 0.1f);
-    shader.SetUniformMat4f("u_MVP", projection);
+    shader.SetUniformMat4f("u_MVP", mvp);
     
 //    load the texture and bind
     Texture texture("res/textures/robot.png");
